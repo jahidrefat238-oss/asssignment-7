@@ -1,84 +1,170 @@
+
 "use client";
 
+import { FcGoogle } from "react-icons/fc";
+import { FaGithub } from "react-icons/fa";
+import { ArrowLeft } from "lucide-react";
+import { useState } from "react";
+import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
-import {Check} from "@gravity-ui/icons";
-import {Button, Description, FieldError, Form, Input, Label, TextField} from "@heroui/react";
+import {
+    Button,
+    Form,
+    Input,
+    Label,
+    TextField,
+    FieldError,
+} from "@heroui/react";
 
 export default function SignInPage() {
-  const onSubmit = async(e) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const data =Object.fromEntries(formData.entries());
-    // console.log("Data from form",data);
-    const {data:resData,error}= await authClient.signIn.email({
-        email:data.email,
-        password: data.password,
-        callbackURL: "/",
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    });
-    console.log(resData);
+    const onSubmit = async (e) => {
+        e.preventDefault();
+        setError("");
+        setLoading(true);
 
-    // Convert FormData to plain object
-    formData.forEach((value, key) => {
-      data[key] = value.toString();
-    });
+        const formData = new FormData(e.currentTarget);
 
-    alert(`Form submitted with: ${JSON.stringify(data, null, 2)}`);
-  };
+        const { error } = await authClient.signIn.email({
+            email: formData.get("email"),
+            password: formData.get("password"),
+            callbackURL: "/",
+        });
 
-  return (
-    <Form className="flex w-96 flex-col gap-4" onSubmit={onSubmit}>
-      <TextField
-        isRequired
-        name="email"
-        type="email"
-        validate={(value) => {
-          if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
-            return "Please enter a valid email address";
-          }
+        if (error) {
+            setError(error.message);
+            setLoading(false);
+        }
+    };
 
-          return null;
-        }}
-      >
-        <Label>Email</Label>
-        <Input placeholder="john@example.com" />
-        <FieldError />
-      </TextField>
+    const socialLogin = async (provider) => {
+        await authClient.signIn.social({
+            provider,
+            callbackURL: "/",
+        });
+    };
 
-      <TextField
-        isRequired
-        minLength={8}
-        name="password"
-        type="password"
-        validate={(value) => {
-          if (value.length < 8) {
-            return "Password must be at least 8 characters";
-          }
-          if (!/[A-Z]/.test(value)) {
-            return "Password must contain at least one uppercase letter";
-          }
-          if (!/[0-9]/.test(value)) {
-            return "Password must contain at least one number";
-          }
+    return (
+        <div className="flex min-h-[calc(100vh-68px)] flex-col items-center bg-[#F0F5F0] px-4 py-7">
 
-          return null;
-        }}
-      >
-        <Label>Password</Label>
-        <Input placeholder="Enter your password" />
-        <Description>Must be at least 8 characters with 1 uppercase and 1 number</Description>
-        <FieldError />
-      </TextField>
+            {/* Heading */}
+            <div className="mb-5 text-center">
+                <h1 className="text-2xl font-bold text-[#26352C]">
+                    সাইন ইন
+                </h1>
 
-      <div className="flex gap-2">
-        <Button type="submit">
-          <Check />
-          Login
-        </Button>
-        <Button type="reset" variant="secondary">
-          Reset
-        </Button>
-      </div>
-    </Form>
-  );
+                <p className="mt-1.5 text-sm text-gray-500">
+                    বিস্তারিত দাম, বাজার তুলনা ও প্রোফাইল দেখতে অ্যাকাউন্টে ঢুকুন।
+                </p>
+            </div>
+
+            {/* Login Card */}
+            <div className="w-full max-w-[440px] rounded-2xl border border-[#E0E8E0] bg-[#FAFCFA] p-5 sm:p-6">
+
+                <Form
+                    className="flex flex-col gap-3"
+                    onSubmit={onSubmit}
+                >
+
+                    {/* Email */}
+                    <TextField isRequired name="email" type="email">
+                        <Label className="text-sm text-[#26352C]">
+                            ইমেইল
+                        </Label>
+
+                        <Input
+                            placeholder="you@example.com"
+                            className="h-10"
+                        />
+
+                        <FieldError />
+                    </TextField>
+
+                    {/* Password */}
+                    <TextField isRequired name="password" type="password">
+                        <Label className="text-sm text-[#26352C]">
+                            পাসওয়ার্ড
+                        </Label>
+
+                        <Input
+                            placeholder="কমপক্ষে ৮ অক্ষর"
+                            className="h-10"
+                        />
+
+                        <FieldError />
+                    </TextField>
+
+                    {error && (
+                        <p className="text-xs text-red-500">
+                            {error}
+                        </p>
+                    )}
+
+                    {/* Sign In Button */}
+                    <Button
+                        type="submit"
+                        isDisabled={loading}
+                        className="h-10 w-full rounded-lg bg-[#078B48] text-sm font-semibold text-white shadow-sm hover:bg-[#056F3A]"
+                    >
+                        {loading ? "অপেক্ষা করুন..." : "সাইন ইন"}
+                    </Button>
+
+                </Form>
+
+                {/* Divider */}
+                <div className="my-4 flex items-center gap-3">
+                    <div className="h-px flex-1 bg-gray-200" />
+                    <span className="text-xs text-gray-500">অথবা</span>
+                    <div className="h-px flex-1 bg-gray-200" />
+                </div>
+
+                {/* Social Login */}
+                
+                <div className="grid grid-cols-2 gap-2">
+
+                    <Button
+                        variant="bordered"
+                        onPress={() => socialLogin("google")}
+                        className="h-10 border border-black text-xs font-semibold text-[#26352C]"
+                    >
+                        <FcGoogle size={17} />
+                        Google দিয়ে চালিয়ে যান
+                    </Button>
+
+                    <Button
+                        variant="bordered"
+                        onPress={() => socialLogin("github")}
+                        className="h-10 border border-black text-xs font-semibold text-[#26352C]"
+                    >
+                        <FaGithub size={17} />
+                        GitHub দিয়ে চালিয়ে যান
+                    </Button>
+
+                </div>
+
+                {/* Sign Up Link */}
+                <p className="mt-4 text-center text-xs text-gray-500">
+                    অ্যাকাউন্ট নেই?{" "}
+                    <Link
+                        href="/sign-up"
+                        className="font-semibold text-[#078B48] underline"
+                    >
+                        সাইন আপ করুন
+                    </Link>
+                </p>
+
+            </div>
+
+            {/* Home Link */}
+            <Link
+                href="/"
+                className="mt-5 text-xs text-gray-500 underline hover:text-[#078B48]"
+            >
+                ← হোম পেজে ফিরে যান
+            </Link>
+
+        </div>
+    );
 }

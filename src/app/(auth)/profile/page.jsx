@@ -1,32 +1,64 @@
-import {Button, Card, CloseButton} from "@heroui/react";
+
+import { Card } from "@heroui/react";
 import Image from "next/image";
-// path to your Better Auth server instance
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
-import Link from "next/link";
+import UpdateProfile from "./UpdateProfile";
+import { redirect } from "next/navigation";
 
-const ProfilePage = async() => {
-    const {user} = await auth.api.getSession({
-    headers: await headers() // you need to pass the headers object.
-});
+const ProfilePage = async () => {
+  const { user } = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-    return (
-        <Card className="w-full items-stretch md:flex-row">
-      <div className="relative h-[140px] w-full shrink-0 overflow-hidden rounded-2xl sm:h-[120px] sm:w-[120px]">
-        <Image src={user.image} height={200} width={300} alt="image"></Image>
+  if (!user) {
+    redirect("/sign-in");
+  }
+
+  return (
+    <div className="min-h-[calc(100vh-68px)] bg-[#F0F5F1] px-4 py-5">
+      <div className="mx-auto max-w-[760px]">
+
+        <div className="mb-7">
+          <h1 className="text-2xl font-bold text-[#202B24]">
+            আমার প্রোফাইল
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
+            আপনার অ্যাকাউন্টের তথ্য এখানে দেখুন।
+          </p>
+        </div>
+
+        {/* Profile Card */}
+        <Card className="mb-6 flex flex-col items-center gap-4 rounded-2xl border border-[#DFE7E0] bg-[#FAFCFA] p-5 shadow-none sm:flex-row">
+
+          <div className="h-[80px] w-[80px] shrink-0 overflow-hidden rounded-2xl">
+            <Image
+              src={user.image}
+              height={200}
+              width={200}
+              alt="image"
+              className="h-full w-full object-cover"
+            />
+          </div>
+
+          <div className="flex-1 text-center sm:text-left">
+            <Card.Title className="text-xl">
+              {user.name}
+            </Card.Title>
+
+            <Card.Description className="mt-1">
+              {user.email}
+            </Card.Description>
+          </div>
+
+        </Card>
+
+        {/* Update Form */}
+        <UpdateProfile name={user.name} />
+
       </div>
-      <div className="flex flex-1 flex-col gap-3">
-        <Card.Header className="gap-1">
-          <Card.Title className="pe-8">{user.name}</Card.Title>
-          <Card.Description>
-            {user.email}
-          </Card.Description>
-          <CloseButton aria-label="Close banner" className="absolute end-3 top-3" />
-        </Card.Header>
-        <Link href={"../update-user"}><Button className="w-full sm:w-auto">Update</Button></Link>
-      </div>
-    </Card>
-    );
+    </div>
+  );
 };
 
 export default ProfilePage;

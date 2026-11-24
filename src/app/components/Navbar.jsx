@@ -141,13 +141,12 @@ export default function Navbar() {
                                 সাইন ইন
                             </Link>
 
+                            <Link href="/sign-up">
                             <Button
-                                as={Link}
-                                href="/sign-up"
                                 className="rounded-lg bg-[#078B48] px-4 py-1.5 text-[13px] font-semibold text-white shadow-sm hover:bg-[#056F3A]"
                             >
                                 সাইন আপ
-                            </Button>
+                            </Button></Link>
                         </>
                     )}
 
