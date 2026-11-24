@@ -6,6 +6,10 @@ const client = new MongoClient(process.env.MONGODB_BETTER_AUTH_URL);
 const db = client.db("assignment7_db");
 
 export const auth = betterAuth({
+    trustedOrigins: [
+    "http://localhost:3000",
+    "https://assignment7-tau.vercel.app",
+  ],
     emailAndPassword: { 
     enabled: true, 
     autoSignIn: false,
