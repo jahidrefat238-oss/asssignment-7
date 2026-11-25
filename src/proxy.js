@@ -1,10 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
-import { headers } from "next/headers";
+import {NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 
 export async function proxy(request) {
     const session = await auth.api.getSession({
-        headers: await headers()
+         headers: request.headers
     })
 
     if(!session) {
@@ -15,6 +14,12 @@ export async function proxy(request) {
 }
 
 export const config = {
-  matcher: ["/dashboard"], // Specify the routes the middleware applies to
-  matcher: ["/profile"], // Specify the routes the middleware applies to
+ matcher: [
+        "/dashboard",
+        "/profile",
+        "/category/:path*",
+        "/product/:path*",
+        "/update-user",
+        "/update-profile",
+    ],
 };
