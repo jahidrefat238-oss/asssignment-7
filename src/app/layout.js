@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import PriceMarquee from "./components/PriceMarquee";
 import { Toaster } from "react-hot-toast";
 import LoginSuccessToast from "./components/Toasts/LoginSuccessToast";
+import Footer from "./components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +31,9 @@ export default function RootLayout({ children }) {
         <Navbar></Navbar>
         <PriceMarquee></PriceMarquee>
         <main>{children}</main>
+        <Footer></Footer>
       </body>
+
       <Toaster
         position="top-center"
         reverseOrder={false}
