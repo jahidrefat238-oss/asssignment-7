@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import UpdateProfile from "./UpdateProfile";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 const ProfilePage = async () => {
   const { user } = await auth.api.getSession({
@@ -53,8 +54,15 @@ const ProfilePage = async () => {
 
         </Card>
 
-        {/* Update Form */}
-        <UpdateProfile name={user.name} />
+        {/* Update Profile Button */}
+        <div className="flex justify-center">
+          <Link
+            href="/update-profile"
+            className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-[#078B48] px-6 text-sm font-semibold text-white transition hover:bg-[#06743D]"
+          >
+            প্রোফাইল আপডেট করুন
+          </Link>
+        </div>
 
       </div>
     </div>

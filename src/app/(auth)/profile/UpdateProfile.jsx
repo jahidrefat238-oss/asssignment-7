@@ -1,29 +1,56 @@
 
 "use client";
 
+import { useState } from "react";
 import { updateUser } from "@/lib/auth-client";
 import { Card, Button } from "@heroui/react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React from "react";
+import toast from "react-hot-toast";
 
 export default function UpdateProfile({ name }) {
-   
+    const router = useRouter();
+    const [loading, setLoading] = useState(false);
 
     const onSubmit = async (e) => {
         e.preventDefault();
 
         const formData = new FormData(e.currentTarget);
-        const data = Object.fromEntries(formData.entries());
+        const newName = formData.get("name").trim();
 
-        const resData = await updateUser({
-            name: data.name,
-        });
+        if (newName.length < 3) {
+            toast.error("নাম কমপক্ষে ৩ অক্ষরের হতে হবে!");
+            return;
+        }
 
-        console.log(resData);
+        if (newName === name) {
+            toast.error("নতুন কোনো পরিবর্তন করা হয়নি!");
+            return;
+        }
 
-        alert("Profile updated successfully!");
-        
+        try {
+            setLoading(true);
+
+            const { error } = await updateUser({
+                name: newName,
+            });
+
+            if (error) {
+                toast.error(error.message || "তথ্য আপডেট করা যায়নি!");
+                return;
+            }
+
+            toast.success("প্রোফাইল সফলভাবে আপডেট হয়েছে!");
+
+            router.refresh();
+            router.push("/profile");
+
+        } catch (error) {
+            console.log("Profile update error:", error);
+            toast.error("কিছু সমস্যা হয়েছে। আবার চেষ্টা করুন!");
+
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -33,7 +60,10 @@ export default function UpdateProfile({ name }) {
                 তথ্য
             </h2>
 
-            <form onSubmit={onSubmit} className="mx-auto w-full max-w-[665px]">
+            <form
+                onSubmit={onSubmit}
+                className="mx-auto w-full max-w-[665px]"
+            >
 
                 <label className="mb-2 block text-sm">
                     নাম
@@ -45,17 +75,17 @@ export default function UpdateProfile({ name }) {
                     defaultValue={name}
                     required
                     minLength={3}
-                    className="h-10 w-full rounded-lg border border-[#DFE7E0] bg-transparent px-3 text-sm outline-none focus:border-[#078B48]"
+                    disabled={loading}
+                    className="h-10 w-full rounded-lg border border-[#DFE7E0] bg-transparent px-3 text-sm outline-none focus:border-[#078B48] disabled:opacity-60"
                 />
 
-                <Link href={"/profile"}>
-                    <Button
-                        type="submit"
-                        className="mt-4 h-11 w-full rounded-lg bg-[#078B48] font-semibold text-white"
-                    >
-                        আপডেট
-                    </Button>
-                </Link>
+                <Button
+                    type="submit"
+                    isDisabled={loading}
+                    className="mt-4 h-11 w-full rounded-lg bg-[#078B48] font-semibold text-white"
+                >
+                    {loading ? "আপডেট হচ্ছে..." : "আপডেট"}
+                </Button>
 
             </form>
 

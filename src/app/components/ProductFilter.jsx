@@ -1,9 +1,16 @@
-
 "use client";
 
 import { Button, Dropdown, Header, Label } from "@heroui/react";
 
+const OPTIONS = [
+    { id: "default", label: "ডিফল্ট" },
+    { id: "low-high", label: "দাম: কম থেকে বেশি" },
+    { id: "high-low", label: "দাম: বেশি থেকে কম" },
+];
+
 export default function ProductFilter({ value, onChange }) {
+
+    const current = value || "default";
 
     const CustomCheckmarkIcon = (
         <svg
@@ -23,54 +30,52 @@ export default function ProductFilter({ value, onChange }) {
     );
 
     const handleSelection = (keys) => {
-        onChange(Array.from(keys)[0] || "");
+        onChange(Array.from(keys)[0] || "default");
     };
 
     return (
         <Dropdown>
 
             <Button
-                aria-label="Product Filter"
+                aria-label="Product Sort"
                 variant="secondary"
                 className="h-9 min-w-[88px] gap-1 rounded-lg border border-[#D1D5DB] bg-[#FAFCFA] px-3 text-[13px] font-medium text-[#26352C] shadow-none hover:bg-[#F0F5F1]"
             >
-                {value === "up"
-                    ? "দাম বেড়েছে"
-                    : value === "down"
-                    ? "দাম কমেছে"
-                    : "ডিফল্ট"}
+                {OPTIONS.find((o) => o.id === current)?.label}
 
                 <span className="text-[10px]">▼</span>
             </Button>
 
-            <Dropdown.Popover className="min-w-[190px]">
+            <Dropdown.Popover className="min-w-[210px]">
 
                 <Dropdown.Menu
-                    selectedKeys={value ? new Set([value]) : new Set()}
+                    selectedKeys={new Set([current])}
                     selectionMode="single"
+                    disallowEmptySelection
                     onSelectionChange={handleSelection}
                 >
 
                     <Dropdown.Section>
-                        <Header>দাম অনুযায়ী ফিল্টার</Header>
 
-                        <Dropdown.Item id="up" textValue="দাম বেড়েছে">
-                            <Dropdown.ItemIndicator>
-                                {({ isSelected }) =>
-                                    isSelected ? CustomCheckmarkIcon : null
-                                }
-                            </Dropdown.ItemIndicator>
-                            <Label>দাম বেড়েছে</Label>
-                        </Dropdown.Item>
+                        <Header>দাম অনুযায়ী সাজান</Header>
 
-                        <Dropdown.Item id="down" textValue="দাম কমেছে">
-                            <Dropdown.ItemIndicator>
-                                {({ isSelected }) =>
-                                    isSelected ? CustomCheckmarkIcon : null
-                                }
-                            </Dropdown.ItemIndicator>
-                            <Label>দাম কমেছে</Label>
-                        </Dropdown.Item>
+                        {OPTIONS.map((option) => (
+
+                            <Dropdown.Item
+                                key={option.id}
+                                id={option.id}
+                                textValue={option.label}
+                            >
+                                <Dropdown.ItemIndicator>
+                                    {({ isSelected }) =>
+                                        isSelected ? CustomCheckmarkIcon : null
+                                    }
+                                </Dropdown.ItemIndicator>
+
+                                <Label>{option.label}</Label>
+                            </Dropdown.Item>
+
+                        ))}
 
                     </Dropdown.Section>
 

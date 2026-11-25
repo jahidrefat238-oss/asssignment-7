@@ -1,12 +1,13 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
+import ProductGridSkeleton from "./ProductSkeleton";
 
 export default function PriceDecrease() {
 
     const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     // Fetch Products
     useEffect(() => {
@@ -28,21 +29,14 @@ export default function PriceDecrease() {
 
             } catch (error) {
                 console.log("Price decrease loading error:", error);
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchProducts();
 
     }, []);
-
-    // Unit Name
-    const getUnit = (unit) => {
-        if (unit === "kg") return "প্রতি কেজি";
-        if (unit === "piece") return "প্রতি পিস";
-        if (unit === "dozen") return "প্রতি ডজন";
-
-        return `প্রতি ${unit}`;
-    };
 
     return (
 
@@ -55,16 +49,24 @@ export default function PriceDecrease() {
             </h2>
 
             {/* Product Cards */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {loading ? (
 
-                {products.map((item) => (
-                    <ProductCard
-                        key={item.id}
-                        product={item}
-                    />
-                ))}
+                <ProductGridSkeleton count={6} />
 
-            </div>
+            ) : (
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+                    {products.map((item) => (
+                        <ProductCard
+                            key={item.id}
+                            product={item}
+                        />
+                    ))}
+
+                </div>
+
+            )}
 
         </section>
 

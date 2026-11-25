@@ -1,15 +1,30 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
 import ProductFilter from "./ProductFilter";
 import ProductCard from "./ProductCard";
+import ProductGridSkeleton from "./ProductSkeleton";
+// Convert price (number / "148" / "১৪৮" / "১,৮৫০") to a real number
+const toNumber = (value) => {
+
+    if (typeof value === "number") return value;
+
+    const bnDigits = "০১২৩৪৫৬৭৮৯";
+
+    const normalized = String(value ?? "")
+        .replace(/[০-৯]/g, (d) => bnDigits.indexOf(d))
+        .replace(/[^\d.]/g, "");
+
+    return Number(normalized) || 0;
+
+};
 
 
 export default function AllProducts() {
 
     const [products, setProducts] = useState([]);
-    const [filter, setFilter] = useState("");
+    const [sort, setSort] = useState("default");
+    const [loading, setLoading] = useState(true);
 
     // Fetch All Products
     useEffect(() => {
@@ -26,6 +41,8 @@ export default function AllProducts() {
 
             } catch (error) {
                 console.log("Products loading error:", error);
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -34,19 +51,16 @@ export default function AllProducts() {
     }, []);
 
     // Filter Products
-    const filteredProducts = products.filter((item) => {
+    // Sort Products by real numeric price
+const filteredProducts = [...products];
 
-        if (filter === "up") {
-            return item.change.dir === "up";
-        }
+if (sort === "low-high") {
+    filteredProducts.sort((a, b) => toNumber(a.today) - toNumber(b.today));
+}
 
-        if (filter === "down") {
-            return item.change.dir === "down";
-        }
-
-        return true;
-
-    });
+if (sort === "high-low") {
+    filteredProducts.sort((a, b) => toNumber(b.today) - toNumber(a.today));
+}
 
     return (
 
@@ -61,42 +75,52 @@ export default function AllProducts() {
             <div className="mb-5 mt-3 flex items-center justify-between gap-3">
 
                 <p className="text-sm text-gray-500">
-                    মোট {filteredProducts.length}টি পণ্য দেখানো হচ্ছে
+                    {loading
+                        ? "পণ্য লোড হচ্ছে..."
+                        : `মোট ${filteredProducts.length}টি পণ্য দেখানো হচ্ছে`}
                 </p>
 
                 <div className="flex items-center gap-2">
 
-                    <span className="text-sm text-gray-500">
-                        ফিল্টার
-                    </span>
+    <span className="text-sm text-gray-500">
+        সাজান
+    </span>
 
-                    <ProductFilter
-                        value={filter}
-                        onChange={setFilter}
-                    />
+    <ProductFilter
+        value={sort}
+        onChange={setSort}
+    />
 
-                </div>
+</div>
 
             </div>
 
             {/* Product Cards */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {loading ? (
 
-                {filteredProducts.map((item) => (
+                <ProductGridSkeleton count={9} />
 
-                    <ProductCard
-                        key={item.id}
-                        product={item}
-                    />
+            ) : (
 
-                ))}
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 
-            </div>
+                    {filteredProducts.map((item) => (
+
+                        <ProductCard
+                            key={item.id}
+                            product={item}
+                        />
+
+                    ))}
+
+                </div>
+
+            )}
 
             {/* No Products */}
-            {filteredProducts.length === 0 && (
+            {!loading && filteredProducts.length === 0 && (
                 <p className="py-10 text-center text-sm text-gray-500">
-                    কোনো পণ্য পাওয়া যায়নি।
+                    কোনো পণ্য পাওয়া যায়নি।
                 </p>
             )}
 
