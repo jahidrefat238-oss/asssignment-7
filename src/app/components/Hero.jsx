@@ -38,11 +38,11 @@ export default function Hero() {
                     </p>
 
                     {/* Button */}
-                    <Link href="/products">
+                    <a href="#all-products">
                         <Button className="mt-5 h-10 rounded-lg bg-[#078B48] px-5 text-sm font-semibold text-white shadow-md hover:bg-[#06783F]">
                             সব পণ্য দেখুন
                         </Button>
-                    </Link>
+                    </a>
 
                 </div>
 
