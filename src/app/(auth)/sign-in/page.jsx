@@ -3,7 +3,6 @@
 
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
-import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
@@ -15,6 +14,7 @@ import {
     TextField,
     FieldError,
 } from "@heroui/react";
+import toast from "react-hot-toast";
 
 export default function SignInPage() {
     const [error, setError] = useState("");
@@ -30,21 +30,29 @@ export default function SignInPage() {
         const { error } = await authClient.signIn.email({
             email: formData.get("email"),
             password: formData.get("password"),
-            callbackURL: "/",
+            callbackURL: "/?login=success",
         });
 
         if (error) {
             setError(error.message);
+            toast.error(error.message || "লগইন করা যায়নি!");
+
             setLoading(false);
+        } else {
+            toast.success("সফলভাবে লগইন হয়েছে!");
         }
     };
 
     const socialLogin = async (provider) => {
-        await authClient.signIn.social({
-            provider,
-            callbackURL: "/",
-        });
-    };
+    const { error } = await authClient.signIn.social({
+        provider,
+        callbackURL: "/?login=success",
+    });
+
+    if (error) {
+        toast.error(error.message || "লগইন করা যায়নি!");
+    }
+};
 
     return (
         <div className="flex min-h-[calc(100vh-68px)] flex-col items-center bg-[#F0F5F0] px-4 py-7">
@@ -121,7 +129,7 @@ export default function SignInPage() {
                 </div>
 
                 {/* Social Login */}
-                
+
                 <div className="grid grid-cols-2 gap-2">
 
                     <Button

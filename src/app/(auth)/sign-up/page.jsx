@@ -2,15 +2,19 @@
 "use client";
 
 import { authClient } from "@/lib/auth-client";
-import { Button } from "@heroui/react";
+import { Button, Spinner, spinner } from "@heroui/react";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function SignUpPage() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,9 +26,11 @@ export default function SignUpPage() {
     const confirmPassword = form.get("confirmPassword");
 
     if (password !== confirmPassword) {
-      alert("পাসওয়ার্ড দুটি মিলছে না!");
+      toast.error("পাসওয়ার্ড মিলছে না!");
       return;
     }
+
+    setLoading(true);
 
     const { error } = await authClient.signUp.email({
       name,
@@ -33,17 +39,19 @@ export default function SignUpPage() {
     });
 
     if (error) {
-      alert(error.message);
+      toast.error(error.message || "অ্যাকাউন্ট তৈরি করা যায়নি!");
+      setLoading(false);
     } else {
-      alert("অ্যাকাউন্ট তৈরি সফল হয়েছে!");
+      toast.success("অ্যাকাউন্ট তৈরি সফল হয়েছে! লগইন করুন");
       router.push("/sign-in");
     }
   };
 
+
   const socialLogin = (provider) => {
     authClient.signIn.social({
       provider,
-      callbackURL: "/",
+      callbackURL: "/?login=success",
     });
   };
 
@@ -120,9 +128,10 @@ export default function SignUpPage() {
             {/* Submit */}
             <Button
               type="submit"
+              isDisabled={loading}
               className="h-10 w-full bg-[#078B48] text-sm font-bold text-white"
             >
-              অ্যাকাউন্ট তৈরি করুন
+              {loading ? <Spinner size="xl" color="white" /> : "অ্যাকাউন্ট তৈরি করুন"}
             </Button>
 
           </form>

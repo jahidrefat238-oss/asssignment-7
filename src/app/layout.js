@@ -1,8 +1,9 @@
-
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import PriceMarquee from "./components/PriceMarquee";
+import { Toaster } from "react-hot-toast";
+import LoginSuccessToast from "./components/Toasts/LoginSuccessToast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,8 +30,22 @@ export default function RootLayout({ children }) {
         <Navbar></Navbar>
         <PriceMarquee></PriceMarquee>
         <main>{children}</main>
-        
-        </body>
+      </body>
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background:"#F0F5F1",
+            color: "#14532D",
+            border: "1px solid #e5e7eb",
+            borderRadius: "10px",
+            fontSize: "14px",
+          },
+        }}
+      />
+      <LoginSuccessToast></LoginSuccessToast>
     </html>
   );
 }
