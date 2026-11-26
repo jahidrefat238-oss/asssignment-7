@@ -1,6 +1,6 @@
 
 "use client";
-
+import toast from "react-hot-toast";
 import React, { useEffect, useState } from "react";
 import { Button } from "@heroui/react";
 import Link from "next/link";
@@ -53,15 +53,20 @@ export default function Navbar() {
 
     // Sign Out
     const handleSignOut = async () => {
+    const { error } = await authClient.signOut();
 
-        await authClient.signOut();
+    if (error) {
+        toast.error(error.message || "লগআউট করা যায়নি!");
+        return;
+    }
 
-        setProfileOpen(false);
-        setMenuOpen(false);
+    toast.success("সফলভাবে লগআউট হয়েছে!");
 
-        router.push("/sign-in");
+    setProfileOpen(false);
+    setMenuOpen(false);
 
-    };
+    router.push("/sign-in");
+};
 
     return (
 

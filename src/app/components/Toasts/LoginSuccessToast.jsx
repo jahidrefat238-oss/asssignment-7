@@ -10,10 +10,15 @@ export default function LoginSuccessToast() {
 
         if (params.get("login") === "success") {
             toast.success("সফলভাবে লগইন হয়েছে!");
-
             window.history.replaceState({}, "", "/");
+        }
+
+        if (params.get("redirected") === "1") {
+            toast("এই পেজটি দেখতে আগে লগইন করুন!");
+            window.history.replaceState({}, "", "/sign-in");
         }
     }, []);
 
     return null;
 }
+

@@ -6,18 +6,20 @@ export async function proxy(request) {
          headers: request.headers
     })
 
-    if(!session) {
-        return NextResponse.redirect(new URL("/sign-in", request.url));
-    }
+    if (!session) {
+    const signInUrl = new URL("/sign-in", request.url);
+    signInUrl.searchParams.set("redirected", "1");
+
+    return NextResponse.redirect(signInUrl);
+}
 
     return NextResponse.next();
 }
 
 export const config = {
- matcher: [
+    matcher: [
         "/dashboard",
         "/profile",
-        "/category/:path*",
         "/product/:path*",
         "/update-user",
         "/update-profile",

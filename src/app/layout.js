@@ -32,9 +32,7 @@ export default function RootLayout({ children }) {
         <PriceMarquee></PriceMarquee>
         <main>{children}</main>
         <Footer></Footer>
-      </body>
-
-      <Toaster
+        <Toaster
         position="top-center"
         reverseOrder={false}
         toastOptions={{
@@ -49,6 +47,7 @@ export default function RootLayout({ children }) {
         }}
       />
       <LoginSuccessToast></LoginSuccessToast>
+      </body>
     </html>
   );
 }
